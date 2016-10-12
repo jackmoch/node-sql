@@ -80,13 +80,9 @@ db.serialize(() => {
 		Select Employee.FirstName || " " || Employee.LastName as "Name" 
 		FROM Employee
 		WHERE Employee.Title = 'Sales Support Agent'
-	`, (err, { Name }) => {
-		table2.push(
-			[`${Name}`]
-		)
-	}, () => {
-		console.log(table2.toString())
-	})
+	`, (err, { Name }) => table2.push([`${Name}`]),
+		() => console.log(table2.toString())
+	)
 
 })
 
