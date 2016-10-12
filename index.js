@@ -38,18 +38,18 @@ db.serialize(() => {
 	// 	console.log(`${CustomerId}: ${Name} (${Country})`)
 	// })
 
-	db.each(`
-		SELECT Customer.FirstName || " " || Customer.LastName as "Name",
-		       Invoice.InvoiceId,
-		       Invoice.InvoiceDate, 
-		       Invoice.BillingCountry from Customer
-		JOIN   Invoice on Customer.CustomerId = Invoice.CustomerId
-		WHERE  Customer.Country = "Brazil"
-	`, (err, {InvoiceId, Name, InvoiceDate, BillingCountry}) => {
-		console.log(`${InvoiceId}: ${Name}, ${InvoiceDate} (${BillingCountry})`)
-	})
+	// db.each(`
+	// 	SELECT Customer.FirstName || " " || Customer.LastName as "Name",
+	// 	       Invoice.InvoiceId,
+	// 	       Invoice.InvoiceDate, 
+	// 	       Invoice.BillingCountry from Customer
+	// 	JOIN   Invoice on Customer.CustomerId = Invoice.CustomerId
+	// 	WHERE  Customer.Country = "Brazil"
+	// `, (err, {InvoiceId, Name, InvoiceDate, BillingCountry}) => {
+	// 	console.log(`${InvoiceId}: ${Name}, ${InvoiceDate} (${BillingCountry})`)
+	// })
 
-	var table = new Table({
+	const table = new Table({
     head: ['Invoice Id', 'Name', 'Invoice Date', 'Billing Country'], 
     colWidths: [30, 30, 30, 30],
     style: {compact: true}
@@ -68,6 +68,24 @@ db.serialize(() => {
 		)
 	}, () => {
 		console.log(table.toString());
+	})
+
+	const table2 = new Table({
+		head: ['Name'], 
+    colWidths: [16],
+    style: {compact: true}
+	})
+
+	db.each(`
+		Select Employee.FirstName || " " || Employee.LastName as "Name" 
+		FROM Employee
+		WHERE Employee.Title = 'Sales Support Agent'
+	`, (err, { Name }) => {
+		table2.push(
+			[`${Name}`]
+		)
+	}, () => {
+		console.log(table2.toString())
 	})
 
 })
