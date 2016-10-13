@@ -109,19 +109,30 @@ knex
 	('Invoice')
 	.where('BillingCountry', 'Brazil')
 	.then((data) => {
-		console.log('Provide a query showing the invoices of customers who are from Brazil.')
+		console.log('6. Provide a query showing the invoices of customers who are from Brazil.')
 		console.log(data)
 	})
 
 knex('Invoice')
 	.select('Invoice.*')
-	.select(knex.raw(`
-		Employee.FirstName || ' ' || Employee.LastName as SalesAgent
-	`))
+	.select(knex.raw(`Employee.FirstName || ' ' || Employee.LastName as SalesAgent`))
 	.join('Customer', 'Invoice.CustomerId', 'Customer.CustomerId')
 	.join('Employee', 'Customer.SupportRepId', 'Employee.EmployeeId')
 	.then((data) => {
-		console.log("Provide a query that shows the invoices associated with each sales agent. The resultant table should include the Sales Agent's full name.")
+		console.log(`7. Provide a query that shows the invoices associated with each sales agent. The resultant table should include the Sales Agent's full name.`)
+		console.log(data)
+	})
+
+knex('Invoice')
+	.select(knex.raw(`Customer.FirstName || ' ' || Customer.LastName as customer_name`))
+	.select(knex.raw(`Employee.FirstName || ' ' || Employee.LastName as employee_name`))
+	.sum('Invoice.Total as total_purchases')
+	.join('Customer', 'Invoice.CustomerId', 'Customer.CustomerId')
+	.join('Employee', 'Customer.SupportRepId', 'Employee.EmployeeId')
+	.groupBy('Customer.CustomerId')
+	.orderBy('total_purchases', 'desc')
+	.then((data) => {
+		console.log('8. Provide a query that shows the Invoice Total, Customer name, Country and Sale Agent name for all invoices and customers.')
 		console.log(data)
 	})
 
