@@ -88,12 +88,17 @@ const db = new Database('db/Chinook_Sqlite.sqlite')
 
 // db.close()
 
+// const knex = require('knex')({
+// 	client: 'sqlite3',
+// 	connection: {
+// 		filename: 'db/Chinook_Sqlite.sqlite'
+// 	},
+// 	useNullAsDefault: false
+// })
+
 const knex = require('knex')({
-	client: 'sqlite3',
-	connection: {
-		filename: 'db/Chinook_Sqlite.sqlite'
-	},
-	useNullAsDefault: false
+	client: 'pg',
+	connection: 'postgres://localhost:5432/chinook',
 })
 
 knex
@@ -107,7 +112,7 @@ knex
 
 knex
 	('Invoice')
-	.where('BillingCountry', 'Brazil')
+	.where('BillingCountry', 'Canada')
 	.then((data) => {
 		console.log('6. Provide a query showing the invoices of customers who are from Brazil.')
 		console.log(data)
@@ -115,7 +120,7 @@ knex
 
 knex('Invoice')
 	.select('Invoice.*')
-	.select(knex.raw(`Employee.FirstName || ' ' || Employee.LastName as SalesAgent`))
+	.select(knex.raw(`"Employee"."FirstName" || ' ' || "Employee"."LastName" as sales_agent`))
 	.join('Customer', 'Invoice.CustomerId', 'Customer.CustomerId')
 	.join('Employee', 'Customer.SupportRepId', 'Employee.EmployeeId')
 	.then((data) => {
@@ -124,16 +129,18 @@ knex('Invoice')
 	})
 
 knex('Invoice')
-	.select(knex.raw(`Customer.FirstName || ' ' || Customer.LastName as customer_name`))
-	.select(knex.raw(`Employee.FirstName || ' ' || Employee.LastName as employee_name`))
+	.select(knex.raw(`"Customer"."FirstName" || ' ' || "Customer"."LastName" as customer_name`))
+	.select(knex.raw(`"Employee"."FirstName" || ' ' || "Employee"."LastName" as employee_name`))
 	.sum('Invoice.Total as total_purchases')
 	.join('Customer', 'Invoice.CustomerId', 'Customer.CustomerId')
 	.join('Employee', 'Customer.SupportRepId', 'Employee.EmployeeId')
-	.groupBy('Customer.CustomerId')
+	.groupBy('Customer.CustomerId', 'Employee.EmployeeId')
 	.orderBy('total_purchases', 'desc')
 	.then((data) => {
 		console.log('8. Provide a query that shows the Invoice Total, Customer name, Country and Sale Agent name for all invoices and customers.')
 		console.log(data)
 	})
+
+
 
 knex.destroy()
